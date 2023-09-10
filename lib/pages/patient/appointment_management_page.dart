@@ -1,9 +1,8 @@
-import 'package:day_night_time_picker/day_night_time_picker.dart';
-import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
 import 'package:flutter/material.dart';
 import 'package:phmss_patient_app/Providers/appointments_provider.dart';
 import 'package:phmss_patient_app/Providers/patient_providers/patient_doctor_provider.dart';
 import 'package:phmss_patient_app/api/api.dart';
+import 'package:phmss_patient_app/controllers/random.dart';
 import 'package:phmss_patient_app/models/appointment.dart';
 import 'package:phmss_patient_app/models/patient_doctor.dart';
 import 'package:phmss_patient_app/pages/patient/create_appointment_page.dart';
@@ -97,10 +96,11 @@ class _AppointmentManagementPageState extends State<AppointmentManagementPage> {
         children: [
           appointments.length == 0
               ? Container(
-                margin: EdgeInsets.only(top: 10),
-                width: double.infinity,
+                  margin: EdgeInsets.only(top: 10),
+                  width: double.infinity,
                   child: Text("No Appointments to display",
-                  style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                       textAlign: TextAlign.center),
                 )
               : ListView.builder(
@@ -136,9 +136,11 @@ class _AppointmentManagementPageState extends State<AppointmentManagementPage> {
                                   fontWeight: FontWeight.bold, fontSize: 20),
                             ),
                             Divider(color: Colors.black, height: 10),
-                            Text(appointment.startTime.toString() +
+                            Text(formatTime(time: appointment.startTime)
+                                    .toString() +
                                 " - " +
-                                appointment.endTime.toString())
+                                formatTime(time: appointment.endTime)
+                                    .toString())
                           ],
                         ),
                       ),
@@ -252,13 +254,14 @@ class _AppointmentManagementPageState extends State<AppointmentManagementPage> {
                         //   child:
                         // ),
                         Text(
-                          "Appointment time - ${appointment.startTime} - ${appointment.endTime}",
+                          "Appointment time - ${formatTime(time: appointment.startTime).toString()} - ${formatTime(
+                                    time: appointment.endTime).toString() }",
                           style: TextStyle(
                             fontSize: 18,
                           ),
                         ),
                         Text(
-                          "Date - ${appointment.date}",
+                          "Date - ${ formatDate(date: appointment.date)}",
                           style: TextStyle(
                             fontSize: 18,
                           ),

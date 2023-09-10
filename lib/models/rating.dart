@@ -1,30 +1,29 @@
-class Medication {
+import 'package:phmss_patient_app/controllers/random.dart';
+
+class Rating {
   int? id;
-  String? name;
+  String? rating;
   String? description;
-  String? dosage;
-  String? frequency;
-  String? imageUrl;
+  int? patientId;
+  int? doctorId;
   String? createdAt;
   String? updatedAt;
 
-  Medication(
+  Rating(
       {this.id,
-      this.name,
+      this.rating,
       this.description,
-      this.dosage,
-      this.frequency,
-      this.imageUrl,
+      this.patientId,
+      this.doctorId,
       this.createdAt,
       this.updatedAt});
 
-  Medication.fromJson(Map<String, dynamic> json) {
+  Rating.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    name = json['name'];
+    rating = json['rating'];
     description = json['description'];
-    dosage = json['dosage'];
-    frequency = json['frequency'];
-    imageUrl = json['imageUrl'];
+    patientId = json['patientId'];
+    doctorId = convertStringToIntIfPossible(json['doctorId']);
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
@@ -32,11 +31,10 @@ class Medication {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
-    data['name'] = this.name;
+    data['rating'] = this.rating;
     data['description'] = this.description;
-    data['dosage'] = this.dosage;
-    data['frequency'] = this.frequency;
-    data['imageUrl'] = this.imageUrl;
+    data['patientId'] = this.patientId;
+    data['doctorId'] = this.doctorId;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
     return data;

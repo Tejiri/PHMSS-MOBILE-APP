@@ -2,8 +2,8 @@ class PossibleIllness {
   int? id;
   String? name;
   String? description;
-  Null? createdAt;
-  Null? updatedAt;
+  String? createdAt;
+  String? updatedAt;
   List<Symptoms>? symptoms;
 
   PossibleIllness(
@@ -46,8 +46,8 @@ class Symptoms {
   int? id;
   String? name;
   String? description;
-  Null? createdAt;
-  Null? updatedAt;
+  String? createdAt;
+  String? updatedAt;
 
   Symptoms(
       {this.id, this.name, this.description, this.createdAt, this.updatedAt});

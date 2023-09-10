@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:phmss_patient_app/Providers/user_provider.dart';
 import 'package:phmss_patient_app/api/api.dart';
 import 'package:phmss_patient_app/models/user.dart';
@@ -7,6 +6,8 @@ import 'package:phmss_patient_app/pages/LoginPage.dart';
 import 'package:phmss_patient_app/pages/patient/appointment_management_page.dart';
 import 'package:phmss_patient_app/pages/patient/check_symptom_page.dart';
 import 'package:phmss_patient_app/pages/patient/illnesses_page.dart';
+import 'package:phmss_patient_app/pages/patient/rate_doctor_page.dart';
+import 'package:phmss_patient_app/pages/patient/update_password_page.dart';
 import 'package:provider/provider.dart';
 
 class PatientHomePage extends StatefulWidget {
@@ -142,7 +143,7 @@ class _PatientHomePageState extends State<PatientHomePage> {
               ),
               drawerContainer(title: "Check Medication"),
               drawerContainer(title: "Check Symptoms"),
-              drawerContainer(title: "Update password"),
+              drawerContainer(title: "Dietary Recommendations"),
               drawerContainer(title: "Appointment management"),
               drawerContainer(title: "Rate doctor"),
               drawerContainer(title: "Update password"),
@@ -222,8 +223,37 @@ class _PatientHomePageState extends State<PatientHomePage> {
             });
 
             break;
+          case "Rate doctor":
+            Navigator.pop(context);
+            setState(() {
+              isLoading = true;
+            });
+
+            await Api().getDoctorRating(context: context).then((value) {
+              setState(() {
+                isLoading = false;
+              });
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RateDoctorPage(),
+                  ));
+            });
+
+            break;
+
+          case "Update password":
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UpdatePasswordPage(),
+                ));
+
+            break;
           default:
         }
+
         // switch (expression) {
         //   case value:
 

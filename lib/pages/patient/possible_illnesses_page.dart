@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:phmss_patient_app/Providers/patient_providers/possible_illnesses_checker_provider.dart';
 import 'package:phmss_patient_app/models/possible_illness.dart';
-import 'package:phmss_patient_app/models/symptom.dart';
 import 'package:provider/provider.dart';
 
 class PossibleIllnessesPage extends StatefulWidget {

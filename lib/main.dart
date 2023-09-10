@@ -4,6 +4,7 @@ import 'package:phmss_patient_app/Providers/patient_providers/patient_doctor_pro
 import 'package:phmss_patient_app/Providers/patient_providers/patient_illnesses_provider.dart';
 import 'package:phmss_patient_app/Providers/patient_providers/patient_medications_provider.dart';
 import 'package:phmss_patient_app/Providers/patient_providers/possible_illnesses_checker_provider.dart';
+import 'package:phmss_patient_app/Providers/patient_providers/rating_provider.dart';
 import 'package:phmss_patient_app/Providers/symptoms_provider.dart';
 import 'package:phmss_patient_app/Providers/user_provider.dart';
 import 'package:phmss_patient_app/pages/LoginPage.dart';
@@ -31,6 +32,9 @@ void main() {
         ),
         ChangeNotifierProvider(
           create: (context) => PatientDoctorProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => RatingProvider(),
         )
       ],
       child: MaterialApp(

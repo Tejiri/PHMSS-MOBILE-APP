@@ -2,8 +2,8 @@ class Symptom {
   int? id;
   String? name;
   String? description;
-  Null? createdAt;
-  Null? updatedAt;
+  String? createdAt;
+  String? updatedAt;
 
   Symptom(
       {this.id, this.name, this.description, this.createdAt, this.updatedAt});

@@ -17,7 +17,9 @@ class _MedicationsPageState extends State<MedicationsPage> {
         Provider.of<PatientMedicationProvider>(context, listen: false)
             .medications;
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("Medications"),
+      ),
       body: ListView.builder(
         itemCount: medications.length,
         itemBuilder: (context, index) {
@@ -62,13 +64,20 @@ class _MedicationsPageState extends State<MedicationsPage> {
                             Padding(
                               padding: EdgeInsets.all(10),
                               child: Column(
-                                children: [ Text("${medication.name}",style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold),),
-                            Text("Dosage - ${medication.dosage}"),
-                            Text("Frequency - ${medication.frequency}"),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10),
-                              child: Text("${medication.description}"),
-                            ),],
+                                children: [
+                                  Text(
+                                    "${medication.name}",
+                                    style: TextStyle(
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text("Dosage - ${medication.dosage}"),
+                                  Text("Frequency - ${medication.frequency}"),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: Text("${medication.description}"),
+                                  ),
+                                ],
                               ),
                             )
                           ],
@@ -77,8 +86,22 @@ class _MedicationsPageState extends State<MedicationsPage> {
                     );
                   });
             },
-            child: Column(
-              children: [Text("${medication.name}")],
+            child: Container(
+              margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+              padding: EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                border: Border.all(),
+                // color: Colors.amber,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "${medication.name}",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )
+                ],
+              ),
             ),
           );
         },

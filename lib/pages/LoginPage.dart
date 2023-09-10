@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:phmss_patient_app/Providers/user_provider.dart';
 import 'package:phmss_patient_app/api/api.dart';
 import 'package:phmss_patient_app/custom_widgets/form_widgets.dart';
-import 'package:phmss_patient_app/pages/patient/patient_homepage.dart';
-import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
