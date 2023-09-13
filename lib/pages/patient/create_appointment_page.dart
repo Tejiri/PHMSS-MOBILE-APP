@@ -119,7 +119,7 @@ class _CreateAppointmentPageState extends State<CreateAppointmentPage> {
                                   startTime: start,
                                   endTime: end,
                                   date: _selectedDate,
-                                  reason: "test")
+                                  reason: appointmentReason.text)
                               .then((value) {
                             setState(() {
                               isLoading = false;

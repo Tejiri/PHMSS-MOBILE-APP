@@ -3,6 +3,8 @@ import 'package:phmss_patient_app/Providers/user_provider.dart';
 import 'package:phmss_patient_app/api/api.dart';
 import 'package:phmss_patient_app/models/user.dart';
 import 'package:phmss_patient_app/pages/LoginPage.dart';
+import 'package:phmss_patient_app/pages/doctor/contact_patient_page.dart';
+import 'package:phmss_patient_app/pages/doctor/create_medication_page.dart';
 import 'package:phmss_patient_app/pages/patient/appointment_management_page.dart';
 import 'package:phmss_patient_app/pages/patient/check_symptom_page.dart';
 import 'package:phmss_patient_app/pages/patient/illnesses_page.dart';
@@ -10,14 +12,14 @@ import 'package:phmss_patient_app/pages/patient/rate_doctor_page.dart';
 import 'package:phmss_patient_app/pages/patient/update_password_page.dart';
 import 'package:provider/provider.dart';
 
-class PatientHomePage extends StatefulWidget {
-  const PatientHomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<PatientHomePage> createState() => _PatientHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _PatientHomePageState extends State<PatientHomePage> {
+class _HomePageState extends State<HomePage> {
   bool isLoading = false;
 
   @override
@@ -29,20 +31,52 @@ class _PatientHomePageState extends State<PatientHomePage> {
         body: Stack(
           children: [
             Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.red, Colors.blue],
+                ),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.only(top: 50),
+              margin: EdgeInsets.only(top: 150),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(50),
+                      topRight: Radius.circular(50))),
               width: double.infinity,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                // mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Text(
+                    "${user?.firstName} ${user?.middleName} ${user?.lastName}",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                  ),
                   Text("${user?.email}"),
-                  Text("${user?.address}"),
-                  Text("${user?.dateOfBirth}"),
-                  Text("${user?.firstName}"),
-                  Text("${user?.lastName}"),
-                  Text("${user?.middleName}"),
+                  Padding(padding: EdgeInsets.only(top: 10)),
+                  Text("${user?.address}, ${user?.postCode}"),
                   Text("${user?.phoneNumber}")
                 ],
               ),
+            ),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: 100),
+                  height: 100,
+                  width: 100,
+                  // color: Colors.blueGrey,
+                  child: CircleAvatar(
+                    minRadius: 5,
+                  ),
+                ),
+              ],
             ),
             // Column(
             //   children: [
@@ -141,11 +175,25 @@ class _PatientHomePageState extends State<PatientHomePage> {
                 height: 200,
                 decoration: BoxDecoration(color: Colors.blue[200]),
               ),
-              drawerContainer(title: "Check Medication"),
-              drawerContainer(title: "Check Symptoms"),
-              drawerContainer(title: "Dietary Recommendations"),
+              user?.role == "patient"
+                  ? drawerContainer(title: "Check Medication")
+                  : Container(),
+              user?.role == "patient"
+                  ? drawerContainer(title: "Check Symptoms")
+                  : Container(),
+              user?.role == "patient"
+                  ? drawerContainer(title: "Dietary Recommendations")
+                  : Container(),
               drawerContainer(title: "Appointment management"),
-              drawerContainer(title: "Rate doctor"),
+              user?.role == "patient"
+                  ? drawerContainer(title: "Rate doctor")
+                  : Container(),
+              user?.role == "doctor"
+                  ? drawerContainer(title: "Contact patient")
+                  : Container(),
+              user?.role == "doctor"
+                  ? drawerContainer(title: "Create medication")
+                  : Container(),
               drawerContainer(title: "Update password"),
               drawerContainer(title: "Logout"),
             ],
@@ -241,6 +289,46 @@ class _PatientHomePageState extends State<PatientHomePage> {
                   ));
             });
 
+            break;
+
+          case "Contact patient":
+            // Navigator.pop(context);
+            // setState(() {
+            //   isLoading = true;
+            // });
+
+            // await Api().getDoctorRating(context: context).then((value) {
+            //   setState(() {
+            //     isLoading = false;
+            //   });
+
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ContactPatientPage(),
+                ));
+            // });
+
+            break;
+
+          case "Create medication":
+            Navigator.pop(context);
+            setState(() {
+              isLoading = true;
+            });
+
+            await Api().getIllnesses(context: context).then(
+              (value) {
+                setState(() {
+                  isLoading = false;
+                });
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CreateMedicationPage(),
+                    ));
+              },
+            );
             break;
 
           case "Update password":

@@ -11,6 +11,17 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  @override
+  void initState() {
+    super.initState();
+    // logDoctorIn();
+  }
+
+  // logDoctorIn() async {
+  //   await Api().login(
+  //       context: context, email: "doctor1@gmail.com", password: "aaaaaa");
+  // }
+
   bool isLoading = false;
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();

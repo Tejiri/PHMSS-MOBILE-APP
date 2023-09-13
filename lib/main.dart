@@ -1,5 +1,7 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:phmss_patient_app/Providers/appointments_provider.dart';
+import 'package:phmss_patient_app/Providers/doctor_providers/doctor_patients_provider.dart';
 import 'package:phmss_patient_app/Providers/patient_providers/patient_doctor_provider.dart';
 import 'package:phmss_patient_app/Providers/patient_providers/patient_illnesses_provider.dart';
 import 'package:phmss_patient_app/Providers/patient_providers/patient_medications_provider.dart';
@@ -10,7 +12,13 @@ import 'package:phmss_patient_app/Providers/user_provider.dart';
 import 'package:phmss_patient_app/pages/LoginPage.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+      // options: DefaultFirebaseOptions.currentPlatform,
+      );
+  // runApp(MyApp());
+
   runApp(
     MultiProvider(
       providers: [
@@ -35,6 +43,9 @@ void main() {
         ),
         ChangeNotifierProvider(
           create: (context) => RatingProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => DoctorPatientsProvider(),
         )
       ],
       child: MaterialApp(

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "963333580538",
+    "project_id": "phmss-96a4d",
+    "storage_bucket": "phmss-96a4d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:963333580538:android:3a900da1de50bb1c5dcb43",
+        "android_client_info": {
+          "package_name": "com.example.phmss_patient_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvLoMP3YaK6iRz13htLAfUpovTF_Cdfj8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

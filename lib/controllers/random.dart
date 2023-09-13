@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:intl/intl.dart';
+import 'package:phmss_patient_app/models/user.dart';
 
 dynamic convertStringToIntIfPossible(dynamic variable) {
   if (variable is String) {
@@ -25,4 +28,14 @@ formatDate({required date}) {
   DateTime parsedDateTime = DateFormat("y-MM-dd H:m:s").parse(date);
 
   return dateTimeFormat.format(parsedDateTime);
+}
+
+String generateRandomString({required int len,required User? user}) {
+  String uid = (user?.id).toString();
+  var r = Random();
+  const _chars =
+      'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+  String rand =
+      List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+  return (rand + uid);
 }

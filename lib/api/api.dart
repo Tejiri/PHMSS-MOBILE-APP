@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:phmss_patient_app/Providers/appointments_provider.dart';
+import 'package:phmss_patient_app/Providers/doctor_providers/doctor_patients_provider.dart';
 import 'package:phmss_patient_app/Providers/patient_providers/patient_doctor_provider.dart';
 import 'package:phmss_patient_app/Providers/patient_providers/patient_illnesses_provider.dart';
 import 'package:phmss_patient_app/Providers/patient_providers/patient_medications_provider.dart';
@@ -21,7 +22,8 @@ import 'package:phmss_patient_app/models/rating.dart';
 import 'package:phmss_patient_app/models/symptom.dart';
 import 'package:phmss_patient_app/models/user.dart';
 import 'package:phmss_patient_app/pages/LoginPage.dart';
-import 'package:phmss_patient_app/pages/patient/patient_homepage.dart';
+import 'package:phmss_patient_app/pages/doctor/doctor_home_page.dart';
+import 'package:phmss_patient_app/pages/homepage.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
@@ -43,12 +45,23 @@ class Api {
       userProvider.updateUserFromJson(parsedJson['user']);
 
       if (parsedJson['user']['role'] == 'doctor') {
+        print(parsedJson['user']['patients']);
+        List<User> patients = [];
+        for (var element in parsedJson['user']['patients']) {
+          User patient = User.fromJson(element);
+          patients.add(patient);
+        }
+        Provider.of<DoctorPatientsProvider>(context, listen: false)
+            .setPatients(patients);
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => HomePage(),
+        ));
       } else if (parsedJson['user']['role'] == 'patient') {
         Provider.of<PatientDoctorProvider>(context, listen: false)
             .updateDoctorFromJson(parsedJson['user']['doctor']);
-        print(parsedJson['user']);
+
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => PatientHomePage(),
+          builder: (context) => HomePage(),
         ));
       }
     } else {
@@ -120,19 +133,20 @@ class Api {
   }
 
   Future<void> getPendingAppointments({required context}) async {
+    User? user = Provider.of<UserProvider>(context, listen: false).user;
     var url = Uri.https(
       baseUrl,
-      "${baseExtension}/patients/pending-appointments",
+      user?.role == "doctor"
+          ? "${baseExtension}/doctors/pending-appointments"
+          : "${baseExtension}/patients/pending-appointments",
     );
     var response = await http.get(url, headers: {
       "Accept": "application/json",
-      "Authorization":
-          "Bearer ${Provider.of<UserProvider>(context, listen: false).user?.token}"
+      "Authorization": "Bearer ${user?.token}"
     });
 
     final Map<String, dynamic> parsedJson = json.decode(response.body);
     if (response.statusCode == 200) {
-      print(parsedJson);
       List<Appointment> appointments = [];
       for (var element in parsedJson['appointments']) {
         Appointment appointment = Appointment.fromJson(element);
@@ -151,14 +165,16 @@ class Api {
   }
 
   Future<void> getCompletedAppointments({required context}) async {
+    User? user = Provider.of<UserProvider>(context, listen: false).user;
     var url = Uri.https(
       baseUrl,
-      "${baseExtension}/patients/completed-appointments",
+      user?.role == "doctor"
+          ? "${baseExtension}/doctors/completed-appointments"
+          : "${baseExtension}/patients/completed-appointments",
     );
     var response = await http.get(url, headers: {
       "Accept": "application/json",
-      "Authorization":
-          "Bearer ${Provider.of<UserProvider>(context, listen: false).user?.token}"
+      "Authorization": "Bearer ${user?.token}"
     });
 
     final Map<String, dynamic> parsedJson = json.decode(response.body);
@@ -259,6 +275,7 @@ class Api {
       required endTime,
       required date,
       required reason}) async {
+    print(reason);
     var url =
         Uri.https(baseUrl, "${baseExtension}/patients/create-appointment");
     var requestBody = {
@@ -399,7 +416,7 @@ class Api {
   }
 
   Future<void> updatePassword({required context, required password}) async {
-    var url = Uri.https(baseUrl, "${baseExtension}/patients/update-password");
+    var url = Uri.https(baseUrl, "${baseExtension}/update-password");
     var requestBody = {
       "password": password,
     };
@@ -429,6 +446,125 @@ class Api {
             (route) => false);
       });
 
+      // .updateRatingFromJson(parsedJson['rating']);
+    } else {
+      Alert(
+              context: context,
+              type: AlertType.error,
+              title: "Error",
+              desc: parsedJson['message'])
+          .show();
+    }
+  }
+
+  Future<void> updateAppointment(
+      {required context,
+      required appointmentId,
+      required appointmentDetails}) async {
+    var url = Uri.https(baseUrl, "${baseExtension}/doctors/update-appointment");
+    var requestBody = {
+      "appointmentId": jsonEncode(appointmentId),
+      "appointmentDetails": appointmentDetails
+    };
+    var response = await http.put(url,
+        headers: {
+          "Accept": "application/json",
+          "Authorization":
+              "Bearer ${Provider.of<UserProvider>(context, listen: false).user?.token}"
+        },
+        body: requestBody);
+
+    final Map<String, dynamic> parsedJson = json.decode(response.body);
+    if (response.statusCode == 200) {
+      bottomAlert(
+          context: context,
+          isError: false,
+          title: "Success",
+          message: "Appointment has been updated to completed successfully");
+
+      // Future.delayed(Duration(seconds: 3), () {
+      //   Navigator.pushAndRemoveUntil(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (context) => LoginPage(),
+      //       ),
+      //       (route) => false);
+      // });
+
+      // .updateRatingFromJson(parsedJson['rating']);
+    } else {
+      Alert(
+              context: context,
+              type: AlertType.error,
+              title: "Error",
+              desc: parsedJson['message'])
+          .show();
+    }
+  }
+
+  Future<void> getIllnesses({required context}) async {
+    final user = Provider.of<UserProvider>(context, listen: false).user;
+    var url = Uri.https(baseUrl, "${baseExtension}/doctors/illnesses");
+    var response = await http.get(url, headers: {
+      "Accept": "application/json",
+      "Authorization": "Bearer ${user?.token}"
+    });
+    final Map<String, dynamic> parsedJson = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      print(parsedJson);
+      List<Illness> illnesses = [];
+      for (var element in parsedJson['illnesses']) {
+        Illness illness = Illness.fromJson(element);
+        illnesses.add(illness);
+      }
+
+      Provider.of<PatientIllnessProvider>(context, listen: false)
+          .setIllnesses(illnesses);
+    } else {
+      Alert(
+              context: context,
+              type: AlertType.error,
+              title: "Error",
+              desc: parsedJson['message'])
+          .show();
+    }
+  }
+
+  Future<void> createMedication(
+      {required context,
+      required illnessId,
+      required String name,
+      required String description,
+      required String dosage,
+      required String frequency,
+      required String imageUrl}) async {
+    var url = Uri.https(baseUrl, "${baseExtension}/doctors/create-medication");
+    var requestBody = {
+      "illnessId": jsonEncode(illnessId),
+      "name": name,
+      "description": description,
+      "dosage": jsonEncode(dosage),
+      "frequency": frequency,
+      "imageUrl": imageUrl
+    };
+
+    var response = await http.post(url,
+        headers: {
+          "Accept": "application/json",
+          "Authorization":
+              "Bearer ${Provider.of<UserProvider>(context, listen: false).user?.token}"
+        },
+        body: requestBody);
+
+    final Map<String, dynamic> parsedJson = json.decode(response.body);
+    if (response.statusCode == 200) {
+      print(parsedJson);
+        bottomAlert(context: context, isError: false,title: "Success",message: "Medication Created successfully");
+        
+      // Rating rating = Rating.fromJson(parsedJson['rating']);
+
+      // Provider.of<RatingProvider>(context, listen: false).setRating(rating);
       // .updateRatingFromJson(parsedJson['rating']);
     } else {
       Alert(

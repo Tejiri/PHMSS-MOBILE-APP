@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:phmss_patient_app/Providers/appointments_provider.dart';
 import 'package:phmss_patient_app/Providers/patient_providers/patient_doctor_provider.dart';
+import 'package:phmss_patient_app/Providers/user_provider.dart';
 import 'package:phmss_patient_app/api/api.dart';
 import 'package:phmss_patient_app/controllers/random.dart';
 import 'package:phmss_patient_app/models/appointment.dart';
 import 'package:phmss_patient_app/models/patient_doctor.dart';
+import 'package:phmss_patient_app/models/user.dart';
 import 'package:phmss_patient_app/pages/patient/create_appointment_page.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +19,7 @@ class AppointmentManagementPage extends StatefulWidget {
 }
 
 class _AppointmentManagementPageState extends State<AppointmentManagementPage> {
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   void initState() {
     getPendingAppointments();
@@ -36,11 +39,15 @@ class _AppointmentManagementPageState extends State<AppointmentManagementPage> {
     "Completed Appointments",
   ];
 
+  TextEditingController appointmentDetails = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+    User? user = Provider.of<UserProvider>(context).user;
     List<Appointment> appointments =
         Provider.of<AppointmentsProvider>(context, listen: false).appointments;
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         // backgroundColor: Color.fromRGBO(38, 48, 75, 1),
         title: Theme(
@@ -108,6 +115,95 @@ class _AppointmentManagementPageState extends State<AppointmentManagementPage> {
                   itemBuilder: (context, index) {
                     Appointment appointment = appointments[index];
                     return GestureDetector(
+                      onLongPress: () {
+                        user?.role == "doctor"
+                            ? showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text('Confirm Update'),
+                                    content: Text(
+                                        'Are you sure you want to update this appointment to completed?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          Navigator.pop(context);
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                title:
+                                                    Text('Appointment details'),
+                                                content: TextField(
+                                                    controller:
+                                                        appointmentDetails),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () async {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                      setState(() {
+                                                        isLoading = true;
+                                                      });
+                                                      await Api()
+                                                          .updateAppointment(
+                                                              context: scaffoldKey
+                                                                  .currentContext!,
+                                                              appointmentDetails:
+                                                                  appointmentDetails
+                                                                      .text,
+                                                              appointmentId:
+                                                                  appointment
+                                                                      .id)
+                                                          .then((value) async {
+                                                        await Api()
+                                                            .getPendingAppointments(
+                                                                context:
+                                                                    scaffoldKey.currentContext!)
+                                                            .then(
+                                                          (value) {
+                                                            setState(() {
+                                                              isLoading = false;
+                                                            });
+                                                          },
+                                                        );
+
+                                                        // await Api()
+                                                        //     .getPendingAppointments(
+                                                        //         context: context)
+                                                        //     .then((value) {
+
+                                                        // });
+                                                      });
+                                                    },
+                                                    child: Text(
+                                                      'Update',
+                                                      style: TextStyle(
+                                                          color: Colors.red),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                        child: Text(
+                                          'Update',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              )
+                            : Container();
+                      },
                       onTap: () async {
                         showAppointmentBottomSheet(appointment, context);
                         // showPossibleIllnessBottomSheet(possibleIllness, context);
@@ -172,15 +268,17 @@ class _AppointmentManagementPageState extends State<AppointmentManagementPage> {
               : Container(),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CreateAppointmentPage(),
-                ));
-          },
-          child: Icon(Icons.add)),
+      floatingActionButton: user?.role == "patient"
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CreateAppointmentPage(),
+                    ));
+              },
+              child: Icon(Icons.add))
+          : Container(),
     );
   }
 
@@ -235,10 +333,10 @@ class _AppointmentManagementPageState extends State<AppointmentManagementPage> {
                           color: Colors.black,
                           thickness: 1,
                         ),
-                        appointment.appointmentDetials == null
+                        appointment.appointmentDetails == null
                             ? Container()
                             : Text(
-                                "${appointment.appointmentDetials}",
+                                "${appointment.appointmentDetails}",
                                 style: TextStyle(
                                   fontSize: 15,
                                 ),
@@ -254,32 +352,56 @@ class _AppointmentManagementPageState extends State<AppointmentManagementPage> {
                         //   child:
                         // ),
                         Text(
-                          "Appointment time - ${formatTime(time: appointment.startTime).toString()} - ${formatTime(
-                                    time: appointment.endTime).toString() }",
+                          "Appointment time - ${formatTime(time: appointment.startTime).toString()} - ${formatTime(time: appointment.endTime).toString()}",
                           style: TextStyle(
                             fontSize: 18,
                           ),
                         ),
                         Text(
-                          "Date - ${ formatDate(date: appointment.date)}",
+                          "Date - ${formatDate(date: appointment.date)}",
                           style: TextStyle(
                             fontSize: 18,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Text(
-                            "Doctor",
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Text(
-                          "${doctor?.firstName} ${doctor?.middleName} ${doctor?.lastName}",
-                          style: TextStyle(
-                            fontSize: 18,
-                          ),
-                        ),
+                        doctor == null
+                            ? Container()
+                            : Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: Text(
+                                  "Doctor",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                        doctor == null
+                            ? Container()
+                            : Text(
+                                "${doctor?.firstName} ${doctor?.middleName} ${doctor?.lastName}",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                ),
+                              ),
+
+                        appointment.appointmentDetails == null
+                            ? Container()
+                            : Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: Text(
+                                  "Appointment Details",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                        appointment.appointmentDetails == null
+                            ? Container()
+                            : Text(
+                                "${appointment.appointmentDetails}",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                ),
+                              ),
                         // ListView.builder(
                         //     shrinkWrap: true,
                         //     itemCount: possibleIllness.symptoms?.length,

@@ -1,7 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:phmss_patient_app/Providers/patient_providers/patient_medications_provider.dart';
 import 'package:phmss_patient_app/models/medication.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletons/skeletons.dart';
 
 class MedicationsPage extends StatefulWidget {
   const MedicationsPage({super.key});
@@ -31,8 +34,8 @@ class _MedicationsPageState extends State<MedicationsPage> {
                   backgroundColor: Colors.transparent,
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(15.0),
-                        topRight: Radius.circular(15.0)),
+                        topLeft: Radius.circular(30.0),
+                        topRight: Radius.circular(30.0)),
                   ),
                   context: context,
                   builder: (context) {
@@ -49,12 +52,28 @@ class _MedicationsPageState extends State<MedicationsPage> {
                             child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 20),
-                              child: Image.asset(
-                                "assets/images/placeholder.jpg",
-                                height: 200,
-                                width: double.infinity,
+                            Center(
+                              child: CachedNetworkImage(
+                                imageUrl: medication.imageUrl.toString(),
+                                imageBuilder: (context, imageProvider) =>
+                                    Container(
+                                  height: 200,
+                                  width: 200,
+                                  child: PhotoView(
+                                      backgroundDecoration: BoxDecoration(),
+                                      imageProvider: imageProvider),
+                                ),
+                                placeholder: (context, url) => SkeletonItem(
+                                    child: Container(
+                                  height: 200,
+                                  width: 200,
+                                  margin: EdgeInsets.only(left: 10, right: 10),
+                                )),
+                                errorWidget: (context, url, error) =>
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 10,bottom: 10),
+                                      child: Icon(Icons.error,size: 50),
+                                    ),
                               ),
                             ),
                             Divider(
@@ -64,6 +83,7 @@ class _MedicationsPageState extends State<MedicationsPage> {
                             Padding(
                               padding: EdgeInsets.all(10),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     "${medication.name}",

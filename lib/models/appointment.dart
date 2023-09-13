@@ -1,7 +1,7 @@
 class Appointment {
   int? id;
   String? reason;
-  String? appointmentDetials;
+  String? appointmentDetails;
   String? startTime;
   String? endTime;
   String? date;
@@ -14,7 +14,7 @@ class Appointment {
   Appointment(
       {this.id,
       this.reason,
-      this.appointmentDetials,
+      this.appointmentDetails,
       this.startTime,
       this.endTime,
       this.date,
@@ -27,7 +27,7 @@ class Appointment {
   Appointment.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     reason = json['reason'];
-    appointmentDetials = json['appointmentDetials'];
+    appointmentDetails = json['appointmentDetails'];
     startTime = json['startTime'];
     endTime = json['endTime'];
     date = json['date'];
@@ -42,7 +42,7 @@ class Appointment {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['reason'] = this.reason;
-    data['appointmentDetials'] = this.appointmentDetials;
+    data['appointmentDetails'] = this.appointmentDetails;
     data['startTime'] = this.startTime;
     data['endTime'] = this.endTime;
     data['date'] = this.date;
